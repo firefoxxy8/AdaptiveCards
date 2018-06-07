@@ -6,13 +6,55 @@ namespace AdaptiveCards.Rendering.Wpf
 {
     public static class AdaptiveContainerRenderer
     {
+        /** Simple helper function to convert from AdaptiveContainerStyle to ContainerStylesConfig */
+        private static ContainerStyleConfig GetContainerStyleConfig(AdaptiveContainerStyle containerStyle, ContainerStylesConfig stylesConfig)
+        {
+            switch (containerStyle)
+            {
+                case AdaptiveContainerStyle.Emphasis:
+                    return stylesConfig.Emphasis;
+                default:
+                    return stylesConfig.Default;
+            };
+        }
+
+        /** Resolve the current container's style using its specified value and the closest ancestor's style */
+        private static AdaptiveContainerStyle ResolveContainerStyleWithContext(AdaptiveContainerStyle specifiedContainerStyle, AdaptiveContainerStyle lastContainerStyle)
+        {
+            switch (specifiedContainerStyle)
+            {
+                // If explicitly specified, use that style
+                case (AdaptiveContainerStyle.Default):
+                    return AdaptiveContainerStyle.Default;
+                case (AdaptiveContainerStyle.Emphasis):
+                    return AdaptiveContainerStyle.Emphasis;
+
+                // Not specified
+                default:
+                    // If last container style is not set, this is the outermost container.
+                    // So it needs to fall back on Default
+                    if (lastContainerStyle == AdaptiveContainerStyle.None)
+                        return AdaptiveContainerStyle.Default;
+
+                    // Otherwise, use the last style
+                    return lastContainerStyle;
+            }
+        }
+
         public static FrameworkElement Render(AdaptiveContainer container, AdaptiveRenderContext context)
         {
-            var containerStyle = context.Config.ContainerStyles.Default;
+            // Resolve the container style
+            var resolvedContainerStyle = ResolveContainerStyleWithContext(container.Style, context.LastContainerStyle);
+            var savedLastContainerStyle = context.LastContainerStyle;
+            context.LastContainerStyle = resolvedContainerStyle;
+
             var uiContainer = new Grid();
             //uiContainer.Margin = new Thickness(context.Config.Spacing.Padding);
             uiContainer.Style = context.GetStyle("Adaptive.Container");
             AddContainerElements(uiContainer, container.Items, context);
+
+            // Set last style back after processing all of its children
+            context.LastContainerStyle = savedLastContainerStyle;
 
             if (container.SelectAction != null)
             {
@@ -20,7 +62,7 @@ namespace AdaptiveCards.Rendering.Wpf
             }
 
             Grid uiOuterContainer = new Grid();
-            uiOuterContainer.Background = context.GetColorBrush(containerStyle.BackgroundColor);
+            uiOuterContainer.Background = context.GetColorBrush(GetContainerStyleConfig(resolvedContainerStyle, context.Config.ContainerStyles).BackgroundColor);
             uiOuterContainer.Children.Add(uiContainer);
             Border border = new Border();
             border.Child = uiOuterContainer;
