@@ -7,7 +7,7 @@ namespace AdaptiveCards.Rendering.Wpf
     public static class AdaptiveContainerRenderer
     {
         /** Simple helper function to convert from AdaptiveContainerStyle to ContainerStylesConfig */
-        private static ContainerStyleConfig GetContainerStyleConfig(AdaptiveContainerStyle containerStyle, ContainerStylesConfig stylesConfig)
+        public static ContainerStyleConfig GetContainerStyleConfig(AdaptiveContainerStyle containerStyle, ContainerStylesConfig stylesConfig)
         {
             switch (containerStyle)
             {
@@ -19,7 +19,7 @@ namespace AdaptiveCards.Rendering.Wpf
         }
 
         /** Resolve the current container's style using its specified value and the closest ancestor's style */
-        private static AdaptiveContainerStyle ResolveContainerStyleWithContext(AdaptiveContainerStyle specifiedContainerStyle, AdaptiveContainerStyle lastContainerStyle)
+        private static AdaptiveContainerStyle ResolveContainerStyle(AdaptiveContainerStyle specifiedContainerStyle, AdaptiveContainerStyle lastContainerStyle)
         {
             switch (specifiedContainerStyle)
             {
@@ -29,14 +29,8 @@ namespace AdaptiveCards.Rendering.Wpf
                 case (AdaptiveContainerStyle.Emphasis):
                     return AdaptiveContainerStyle.Emphasis;
 
-                // Not specified
+                // Otherwise, use the last style
                 default:
-                    // If last container style is not set, this is the outermost container.
-                    // So it needs to fall back on Default
-                    if (lastContainerStyle == AdaptiveContainerStyle.None)
-                        return AdaptiveContainerStyle.Default;
-
-                    // Otherwise, use the last style
                     return lastContainerStyle;
             }
         }
@@ -44,7 +38,7 @@ namespace AdaptiveCards.Rendering.Wpf
         public static FrameworkElement Render(AdaptiveContainer container, AdaptiveRenderContext context)
         {
             // Resolve the container style
-            var resolvedContainerStyle = ResolveContainerStyleWithContext(container.Style, context.LastContainerStyle);
+            var resolvedContainerStyle = ResolveContainerStyle(container.Style, context.LastContainerStyle);
             var savedLastContainerStyle = context.LastContainerStyle;
             context.LastContainerStyle = resolvedContainerStyle;
 

@@ -172,6 +172,16 @@ namespace AdaptiveCards
         public string Lang { get; set; }
 
         /// <summary>
+        ///     The style in which the card is displayed.
+        /// </summary>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
+#if !NETSTANDARD1_3
+        [XmlAttribute]
+#endif
+        [DefaultValue(typeof(AdaptiveContainerStyle), "none")]
+        public AdaptiveContainerStyle Style { get; set; }
+
+        /// <summary>
         /// Parse an AdaptiveCard from a JSON string
         /// </summary>
         /// <param name="json">A JSON-serialized Adaptive Card</param>

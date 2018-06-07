@@ -89,11 +89,40 @@ namespace AdaptiveCards.Rendering.Wpf
 
         public ResourceResolver ResourceResolvers { get; } = new ResourceResolver();
 
+        /** Resolve the current card's style using its specified value, allow flag, and the closest ancestor's style */
+        private static AdaptiveContainerStyle ResolveCardStyle(AdaptiveContainerStyle specifiedCardStyle, bool allowCardStyle, AdaptiveContainerStyle lastContainerStyle)
+        {
+            // If allowed and explicitly specified, use that style
+            if (allowCardStyle && specifiedCardStyle != AdaptiveContainerStyle.None)
+            {
+                switch (specifiedCardStyle)
+                {
+                    case (AdaptiveContainerStyle.Default):
+                        return AdaptiveContainerStyle.Default;
+                    case (AdaptiveContainerStyle.Emphasis):
+                        return AdaptiveContainerStyle.Emphasis;
+                }
+            }
+
+            // Otherwise, set to Default for main card and use the last style for others (ShowCards)
+            // TODO: Test ShowCard styles
+            if (lastContainerStyle == AdaptiveContainerStyle.None)
+                return AdaptiveContainerStyle.Default;
+
+            // Otherwise, use the last style
+            return lastContainerStyle;
+        }
+
         public static FrameworkElement RenderAdaptiveCardWrapper(AdaptiveCard card, AdaptiveRenderContext context)
         {
+            // Resolve the card style
+            var resolvedCardStyle = ResolveCardStyle(card.Style, context.Config.AdaptiveCard.AllowCustomStyle, context.LastContainerStyle);
+            var savedLastContainerStyle = context.LastContainerStyle;
+            context.LastContainerStyle = resolvedCardStyle;
+
             var outerGrid = new Grid();
             outerGrid.Style = context.GetStyle("Adaptive.Card");
-            outerGrid.Background = context.GetColorBrush(context.Config.ContainerStyles.Default.BackgroundColor);
+            outerGrid.Background = context.GetColorBrush(AdaptiveContainerRenderer.GetContainerStyleConfig(resolvedCardStyle, context.Config.ContainerStyles).BackgroundColor);
             outerGrid.SetBackgroundSource(card.BackgroundImage, context);
 
             var grid = new Grid();
@@ -105,6 +134,9 @@ namespace AdaptiveCards.Rendering.Wpf
 
             AdaptiveContainerRenderer.AddContainerElements(grid, card.Body, context);
             AdaptiveActionSetRenderer.AddActions(grid, card.Actions, context);
+
+            // Set last style back after processing all of its children
+            context.LastContainerStyle = savedLastContainerStyle;
 
             outerGrid.Children.Add(grid);
             return outerGrid;

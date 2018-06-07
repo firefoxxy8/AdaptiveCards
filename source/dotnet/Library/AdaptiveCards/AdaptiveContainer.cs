@@ -52,7 +52,7 @@ namespace AdaptiveCards
         public AdaptiveAction SelectAction { get; set; }
 
         /// <summary>
-        ///     The style in which the image is displayed.
+        ///     The style in which the container is displayed.
         /// </summary>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
 #if !NETSTANDARD1_3
