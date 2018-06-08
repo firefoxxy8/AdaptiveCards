@@ -7,10 +7,13 @@ namespace AdaptiveCards.Rendering.Wpf
     {
         public static FrameworkElement Render(AdaptiveToggleInput input, AdaptiveRenderContext context)
         {
+            // Get its container's style config
+            var containerStyleConfig = AdaptiveContainerRenderer.GetContainerStyleConfig(context.LastContainerStyle, context.Config.ContainerStyles);
+
             var uiToggle = new CheckBox();
             uiToggle.Content = input.Title;
             uiToggle.Foreground =
-                context.GetColorBrush(context.Config.ContainerStyles.Default.ForegroundColors.Default.Default);
+                context.GetColorBrush(containerStyleConfig.ForegroundColors.Default.Default);
             uiToggle.SetState(input.Value == (input.ValueOn ?? "true"));
             uiToggle.Style = context.GetStyle($"Adaptive.Input.Toggle");
             uiToggle.SetContext(input);

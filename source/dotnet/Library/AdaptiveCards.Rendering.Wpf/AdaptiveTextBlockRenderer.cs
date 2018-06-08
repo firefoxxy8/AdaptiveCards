@@ -17,30 +17,33 @@ namespace AdaptiveCards.Rendering.Wpf
         {
             var uiTextBlock = CreateControl(textBlock, context);
 
+            // Get its container's style config
+            var containerStyleConfig = AdaptiveContainerRenderer.GetContainerStyleConfig(context.LastContainerStyle, context.Config.ContainerStyles);
+
             FontColorConfig colorOption;
             switch (textBlock.Color)
             {
                 case AdaptiveTextColor.Accent:
-                    colorOption = context.Config.ContainerStyles.Default.ForegroundColors.Accent;
+                    colorOption = containerStyleConfig.ForegroundColors.Accent;
                     break;
                 case AdaptiveTextColor.Attention:
-                    colorOption = context.Config.ContainerStyles.Default.ForegroundColors.Attention;
+                    colorOption = containerStyleConfig.ForegroundColors.Attention;
                     break;
                 case AdaptiveTextColor.Dark:
-                    colorOption = context.Config.ContainerStyles.Default.ForegroundColors.Dark;
+                    colorOption = containerStyleConfig.ForegroundColors.Dark;
                     break;
                 case AdaptiveTextColor.Good:
-                    colorOption = context.Config.ContainerStyles.Default.ForegroundColors.Good;
+                    colorOption = containerStyleConfig.ForegroundColors.Good;
                     break;
                 case AdaptiveTextColor.Light:
-                    colorOption = context.Config.ContainerStyles.Default.ForegroundColors.Light;
+                    colorOption = containerStyleConfig.ForegroundColors.Light;
                     break;
                 case AdaptiveTextColor.Warning:
-                    colorOption = context.Config.ContainerStyles.Default.ForegroundColors.Warning;
+                    colorOption = containerStyleConfig.ForegroundColors.Warning;
                     break;
                 case AdaptiveTextColor.Default:
                 default:
-                    colorOption = context.Config.ContainerStyles.Default.ForegroundColors.Default;
+                    colorOption = containerStyleConfig.ForegroundColors.Default;
                     break;
             }
 
