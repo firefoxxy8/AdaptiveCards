@@ -6,13 +6,16 @@ namespace AdaptiveCards.Rendering.Wpf
 {
     public static class AdaptiveRenderContextExtensions
     {
-        public static FrameworkElement RenderSelectAction(this AdaptiveRenderContext context, AdaptiveAction selectAction, FrameworkElement uiElement)
+        public static FrameworkElement RenderSelectAction(this AdaptiveRenderContext context, AdaptiveAction selectAction, FrameworkElement uiElement, string backgroundColor = null)
         {
             if (context.Config.SupportsInteractivity)
             {
                 var uiButton = (Button) context.Render(selectAction);
                 uiButton.HorizontalAlignment = HorizontalAlignment.Left;
-                uiButton.Background = new SolidColorBrush(Colors.Transparent);
+                if (backgroundColor != null)
+                {
+                    uiButton.Background = context.GetColorBrush(backgroundColor);
+                }
                 uiButton.BorderThickness = new Thickness(0);
                 uiButton.Content = uiElement;
                 uiButton.Style = context.GetStyle("Adaptive.Action.Tap");

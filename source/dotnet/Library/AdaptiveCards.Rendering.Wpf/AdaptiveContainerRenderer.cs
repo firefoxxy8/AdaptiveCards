@@ -42,25 +42,32 @@ namespace AdaptiveCards.Rendering.Wpf
             var savedLastContainerStyle = context.LastContainerStyle;
             context.LastContainerStyle = resolvedContainerStyle;
 
+            var backgroundColor = GetContainerStyleConfig(resolvedContainerStyle, context.Config.ContainerStyles).BackgroundColor;
+
             var uiContainer = new Grid();
             //uiContainer.Margin = new Thickness(context.Config.Spacing.Padding);
             uiContainer.Style = context.GetStyle("Adaptive.Container");
             AddContainerElements(uiContainer, container.Items, context);
 
-            // Set last style back after processing all of its children
-            context.LastContainerStyle = savedLastContainerStyle;
+            FrameworkElement renderedElement;
 
             if (container.SelectAction != null)
             {
-                return context.RenderSelectAction(container.SelectAction, uiContainer);
+                renderedElement = context.RenderSelectAction(container.SelectAction, uiContainer, backgroundColor);
+            }
+            else
+            {
+                Grid uiOuterContainer = new Grid();
+                uiOuterContainer.Background = context.GetColorBrush(backgroundColor);
+                uiOuterContainer.Children.Add(uiContainer);
+                renderedElement = new Border();
+                (renderedElement as Border).Child = uiOuterContainer;
             }
 
-            Grid uiOuterContainer = new Grid();
-            uiOuterContainer.Background = context.GetColorBrush(GetContainerStyleConfig(resolvedContainerStyle, context.Config.ContainerStyles).BackgroundColor);
-            uiOuterContainer.Children.Add(uiContainer);
-            Border border = new Border();
-            border.Child = uiOuterContainer;
-            return border;
+            // Set last style back after processing all of its children
+            context.LastContainerStyle = savedLastContainerStyle;
+
+            return renderedElement;
         }
 
         public static void AddContainerElements(Grid uiContainer, IList<AdaptiveElement> elements, AdaptiveRenderContext context)
