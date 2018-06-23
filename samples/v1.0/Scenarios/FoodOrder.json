@@ -68,6 +68,7 @@
 						"type": "Input.Text",
 						"id": "SteakOther",
 						"isMultiline": true,
+                         "maxLength": 10,
 						"placeholder": "Any other preparation requestes?"
 					}
 				],

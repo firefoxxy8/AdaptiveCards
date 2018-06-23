@@ -11,6 +11,7 @@
 			"type": "Input.Text",
 			"id": "myComment",
 			"placeholder": "text",
+             "maxlength": 10,adsklfjads
 			"style": "text"
 		},
 		{
